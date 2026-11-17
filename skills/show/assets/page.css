@@ -1,0 +1,202 @@
+/* show: one reading column. Each question sits directly under the text that explains it.
+   The build step puts the @font-face rules for the IBM Plex fonts in front of this file. */
+:root {
+  color-scheme: light dark;
+  --bg: #f3f5f7; --surface: #ffffff; --surface-2: #e9edf1;
+  --fg: #182029; --muted: #56606e; --line: #d4dae2; --line-strong: #a9b3c0;
+  --accent: #0d6a87; --accent-soft: #dcecf1; --code-bg: #f8f9fb;
+  --ok: #1f7a55; --ok-soft: #d7efe3; --warn: #9a5b00; --warn-soft: #f6e7c8; --gone: #a33a3a; --gone-soft: #f5dcdc;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1115; --surface: #151a20; --surface-2: #1d232b; --fg: #e3e7ed; --muted: #97a1b0;
+    --line: #29303a; --line-strong: #3f4855; --accent: #5bb7d2; --accent-soft: #14303a; --code-bg: #11151a;
+    --ok: #6fcf9f; --ok-soft: #173326; --warn: #e2b25c; --warn-soft: #3a2c10; --gone: #ec8f8f; --gone-soft: #3a1c1c;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+/* scroll-padding-top keeps the target of a contents link below the sticky status bar. */
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 84px; }
+/* counter-reset here gives each question its number; see "fieldset.ask > legend::before". */
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; counter-reset: question; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+/* ---- layout ---- */
+/* The large bottom padding keeps the last lines above the two buttons (Comments, padlock) that the
+   nsite-clay runtime draws in the bottom right corner. */
+.page { max-width: 1000px; margin: 0 auto; padding-block: 32px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 40px; }
+section, .part { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.part { gap: 40px; }
+
+/* ---- text ---- */
+h1, h2, h3, h4 { font-family: var(--display); line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); font-weight: 600; }
+h2 { font-size: 1.5rem; font-weight: 600; padding-top: 10px; border-top: 2px solid var(--fg); }
+h3 { font-size: 1.12rem; font-weight: 600; margin-top: 6px; }
+.partname { font-family: var(--display); font-weight: 600; font-size: 1.05rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bg); background: var(--fg); padding: 8px 14px; border-radius: 3px; align-self: flex-start; }
+p, li { max-width: 74ch; margin: 0; }
+ul, ol { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
+pre { font-family: var(--mono); font-size: 0.79rem; line-height: 1.5; background: var(--code-bg); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; margin: 0; overflow-x: auto; }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+/* The colors of code. The build writes these spans into each <code class="language-xx"> block. */
+.tk-c { color: var(--muted); }
+.tk-s { color: var(--ok); }
+.tk-k { color: var(--accent); }
+.tk-n { color: var(--warn); }
+.eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.1rem; }
+.note { font-size: 0.9rem; color: var(--muted); }
+.lab { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+nav.toc { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.92rem; }
+
+/* ---- tables ---- */
+/* A wide table scrolls inside .scroll, so the page itself never scrolls sideways on a phone. */
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--display); font-weight: 600; background: var(--surface-2); white-space: nowrap; }
+td:first-child { min-width: 13em; }
+
+/* ---- tags ---- */
+.tag { display: inline-block; font-family: var(--mono); font-size: 0.7rem; font-weight: 400; letter-spacing: 0.04em; padding: 1px 7px; border-radius: 3px; white-space: nowrap; }
+.tag.new { background: var(--ok-soft); color: var(--ok); }
+.tag.less { background: var(--gone-soft); color: var(--gone); }
+.tag.same { background: var(--surface-2); color: var(--muted); }
+.tag.ask { background: var(--warn-soft); color: var(--warn); }
+.tag.rec { background: var(--accent-soft); color: var(--accent); }
+
+/* ---- diagrams: inline SVG that takes its colors from the page ---- */
+figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+figure .scroll { padding: 8px; }
+/* min-width keeps the labels readable on a phone; the figure scrolls sideways instead of shrinking. */
+figure > .scroll > svg { display: block; width: 100%; min-width: 760px; height: auto; color: var(--fg); font-family: var(--body); }
+figcaption { font-size: 0.88rem; color: var(--muted); max-width: 80ch; }
+.s-box { fill: var(--surface); stroke: var(--line-strong); }
+.s-ok { fill: var(--ok-soft); stroke: var(--ok); }
+.s-miss { fill: var(--surface-2); stroke: var(--line-strong); stroke-dasharray: 4 3; }
+.s-axis { stroke: var(--line-strong); }
+.s-arrow { stroke: var(--fg); fill: none; }
+.s-drop { stroke: var(--gone); fill: none; stroke-dasharray: 5 4; }
+.s-muted { fill: var(--muted); }
+.s-okt { fill: var(--ok); }
+.s-gonet { fill: var(--gone); }
+
+/* ---- a question: a fieldset of rows that look like the choices they are ---- */
+fieldset.ask { counter-increment: question; border: 1px solid var(--line-strong); border-left: 4px solid var(--warn); border-radius: 4px; background: var(--surface); margin: 0; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+fieldset.ask > legend { font-family: var(--display); font-weight: 600; font-size: 1.1rem; padding: 0 6px; }
+/* The number comes from a CSS counter, so a question that moves needs no new number in the markup. */
+fieldset.ask > legend::before { content: "Question " counter(question); font-family: var(--mono); font-size: 0.72rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warn); margin-right: 8px; }
+/* A question with an answer changes from amber to green. CSS reads the form; no script sets a class,
+   because the page saves its own markup and a class that a script sets would be saved with it. */
+fieldset.ask:has(input:checked), fieldset.ask:not(:has(input)):has(textarea:not(:placeholder-shown)) { border-left-color: var(--ok); }
+fieldset.ask:has(input:checked) > legend::before, fieldset.ask:not(:has(input)):has(textarea:not(:placeholder-shown)) > legend::before { color: var(--ok); }
+label.opt { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 4px; cursor: pointer; }
+label.opt:hover { border-color: var(--line-strong); }
+/* A selected option has the border and the tint of the accent color. The border keeps its width,
+   so a selected option does not change its size. */
+label.opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+label.opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+label.opt input { margin: 5px 0 0; accent-color: var(--accent); }
+@media (prefers-reduced-motion: no-preference) { label.opt { transition: border-color 0.12s ease, background-color 0.12s ease; } }
+label.opt b { font-weight: 600; }
+label.opt span.d { grid-column: 2; font-size: 0.9rem; color: var(--muted); }
+label.field { display: flex; flex-direction: column; gap: 4px; }
+
+/* ---- form controls ---- */
+/* 16px stops iOS Safari from zooming into a field on focus. */
+textarea, input[type="text"] { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong); border-radius: 4px; padding: 8px 10px; width: 100%; }
+textarea { min-height: 2.6em; resize: vertical; }
+textarea:focus-visible, input:focus-visible, a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button { font: inherit; font-size: 0.92rem; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 4px; padding: 6px 12px; cursor: pointer; }
+
+/* ---- boxes ---- */
+.tool { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 10px 16px; }
+details[open] { padding-bottom: 14px; }
+summary { cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 1.05rem; }
+details > * + * { margin-top: 10px; }
+.files { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
+.files > div { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.files ul { font-size: 0.92rem; }
+
+/* ---- good and cost of an option ---- */
+.pc { grid-column: 2; list-style: none; padding: 0; gap: 6px; font-size: 0.92rem; }
+.pc li { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 8px; max-width: none; }
+.pc li > b { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; padding-top: 0.22em; }
+.pc .good { color: var(--ok); }
+.pc .cost { color: var(--warn); }
+
+/* ---- option cards: each answer shows a drawing of its result ---- */
+/* A card is an option row with a drawing above its name. It has the same border, corners and
+   selected state as a row. */
+.choices { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); align-items: start; }
+/* The drawing touches the edges of the card, so the card has no padding at the top and the sides. */
+.choices > label.opt { gap: 8px 10px; padding: 0 0 12px; overflow: hidden; background: var(--surface); }
+.choices > label.opt:has(input:checked) { background: var(--accent-soft); }
+.choices > label.opt > .shot { grid-column: 1 / -1; }
+.choices > label.opt > input { margin: 5px 0 0 12px; }
+.choices > label.opt > b { margin-right: 12px; }
+/* A card without a drawing starts with its radio button, so it needs the top padding back. */
+.choices > label.opt > input:first-child { margin-top: 17px; }
+.choices > label.opt > input:first-child + b { margin-top: 12px; }
+.choices > label.opt > :is(.d, .pc) { grid-column: 1 / -1; margin-inline: 12px; }
+
+/* ---- mockups: drawings of the app ---- */
+/* .shot is the backdrop of a drawing. A page sets --shot-bg and --shot-fg to fit the app that it draws. */
+.shot { container-type: inline-size; background: var(--shot-bg, var(--surface-2)); color: var(--shot-fg, var(--muted)); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+figure > .shot { border-radius: 4px; }
+/* .mock is one drawn screen or one part of a screen. Inside it, 1em is 16 px of the real app.
+   --mock-w is the width of the drawing in em (a phone of 390 px is 24.4). The font size shrinks
+   when the container is narrower than the drawing, and all sizes in em shrink with it.
+   --mock-px is the largest font size: 11px draws the app at 11/16 of its real size. */
+.mock { font-size: min(var(--mock-px, 11px), calc(100cqw / var(--mock-w, 24.4))); width: calc(var(--mock-w, 24.4) * 1em); max-width: 100%; margin: 0 auto; position: relative; overflow: hidden; text-align: left; line-height: 1.375; }
+.mock svg { flex: none; width: 1.25em; height: 1.25em; }
+/* .flow puts screens side by side with an arrow between them. Each .cell is the container that its .mock measures. */
+.flow { display: flex; align-items: center; gap: 8px; }
+.flow > .cell { flex: 1 1 0; min-width: 0; container-type: inline-size; display: flex; flex-direction: column; gap: 6px; }
+.flow > .arrow { flex: none; max-width: 7em; font-size: 0.72rem; text-align: center; line-height: 1.3; }
+.flow > .arrow::before { content: "→"; display: block; font-size: 1.3rem; }
+.flow > .arrow.back::before { content: "←"; }
+.cap { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; }
+@media (max-width: 620px) {
+  /* On a phone the screens go below each other, and the arrows turn. */
+  .flow { flex-direction: column; align-items: stretch; }
+  .flow > .cell { flex: none; }
+  .flow > .arrow { max-width: none; }
+  .flow > .arrow::before { content: "↓"; }
+  .flow > .arrow.back::before { content: "↑"; }
+}
+
+/* ---- points: remarks of a review, each with its result at the right ---- */
+.points { display: flex; flex-direction: column; counter-reset: point; }
+.points > article { counter-increment: point; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 14em); gap: 6px 24px; padding-block: 14px; border-bottom: 1px solid var(--line); align-items: start; }
+.points > article > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.points h3 { margin: 0; }
+.points h3::before { content: counter(point); color: var(--accent); margin-right: 10px; }
+.points .outcome { align-items: flex-start; font-size: 0.9rem; color: var(--muted); }
+@media (max-width: 760px) { .points > article { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- parts that page.js draws ---- */
+/* The status bar reports what is saved. It sticks to the top, so it shows next to each question.
+   It is not at the bottom, because the buttons of the nsite-clay runtime cover the bottom right corner. */
+.bar { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line-strong); padding: calc(9px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 9px max(16px, env(safe-area-inset-left, 0px)); }
+.bar .in { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; font-size: 0.9rem; }
+.bar .count { font-family: var(--mono); font-size: 0.82rem; }
+.bar .state { color: var(--muted); }
+.bar .state.ok { color: var(--ok); }
+.bar .state.bad { color: var(--gone); }
+.answers-text textarea { font-family: var(--mono); font-size: 0.8rem; min-height: 9em; }
+.answers-text .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* A person with the read link sees the answers and cannot change them. The runtime sets
+   nc:owner-here="true" only for a link that can save. The rule is on the labels, because a tap on a
+   label selects or focuses its control also when the control itself ignores the pointer. */
+html[nc\:ready="true"]:not([nc\:owner-here="true"]) fieldset.ask label { pointer-events: none; }
+html[nc\:ready="true"]:not([nc\:owner-here="true"]) .answers-text .use-rec { display: none; }
