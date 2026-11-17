@@ -1,0 +1,3 @@
+# Pages and work files that an agent made while it tried the skill
+*.page.html
+/work/
