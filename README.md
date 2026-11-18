@@ -195,8 +195,8 @@ docker run -d --name show-dev -p 7469:7469 -e SHOW_TOKEN=<a token> show-server:d
 SHOW_URL=http://localhost:7469 SHOW_TOKEN=<the token> bash server/test.sh
 ```
 
-The workflow `container.yml` does the same on each pull request, and publishes the image only
-after a push to `main` or a `v*` tag.
+The workflow `container.yml` does the same on each pull request, and it also builds the `arm64`
+image there. It publishes the images only after a push to `main` or a `v*` tag.
 
 `test.sh` needs only `curl`. It checks the endpoints and each rule that makes the server refuse a
 page. It does not open a browser, so it does not check `web/page.js`.

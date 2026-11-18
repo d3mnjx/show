@@ -3,11 +3,13 @@
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0.100-resolute-aot AS build
 ARG TARGETARCH
 ARG BUILDARCH
-# The -aot image has clang but no linker or C runtime for a foreign arch. Add them only for a cross build.
+# A cross build needs clang, because the SDK gives the linker a --target option that gcc does not
+# have. The .NET 11 -aot image has only gcc. llvm brings llvm-objcopy, which can strip a binary of a
+# foreign arch. The gcc and libc packages bring the linker and the C runtime of the target.
 RUN if [ "$TARGETARCH" != "$BUILDARCH" ]; then \
       case "$TARGETARCH" in arm64) triple=aarch64-linux-gnu ;; amd64) triple=x86-64-linux-gnu ;; *) exit 1 ;; esac; \
       apt-get update && apt-get install -y --no-install-recommends \
-        "gcc-$triple" "binutils-$triple" "libc6-dev-$TARGETARCH-cross" \
+        clang llvm "gcc-$triple" "binutils-$triple" "libc6-dev-$TARGETARCH-cross" \
       && rm -rf /var/lib/apt/lists/*; \
     fi
 WORKDIR /src
