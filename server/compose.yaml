@@ -1,0 +1,17 @@
+services:
+  show:
+    # The image that GitHub builds from the main branch. "docker compose build" makes it from this folder.
+    image: ghcr.io/urza/show:latest
+    build: .
+    ports:
+      - "${SHOW_PORT:-7469}:7469"
+    environment:
+      SHOW_TOKEN: ${SHOW_TOKEN:?Set SHOW_TOKEN in .env}
+      SHOW_PUBLIC_URL: ${SHOW_PUBLIC_URL:-}
+    volumes:
+      # The pages and the answers. Without this volume, a new container starts empty.
+      - show-data:/data
+    restart: unless-stopped
+
+volumes:
+  show-data:

@@ -1,3 +1,7 @@
-# Pages and work files that an agent made while it tried the skill
-*.page.html
+# Pages that an agent made while it tried the skill
 /work/
+
+# The server: build output and the file with the token
+bin/
+obj/
+.env
